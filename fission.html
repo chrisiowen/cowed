@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+<title>Moving from point to point</title>
+
+	<style>
+	canvas {
+		border: 1px #CCC solid;
+	}
+		
+	</style>
+	
+</head>
+ 
+<body>
+
+	<center>
+	<h1>Fission</h1>
+	<div id="container"><canvas id="myCanvas" height="600" width="1200"></canvas></div>
+	<input id="clickMe" type="button" value="Restart" onclick="create_scene();" />
+	</center>
+
+<script>
+
+var mainCanvas = document.querySelector("#myCanvas");
+var mainContext = mainCanvas.getContext("2d");
+ 
+var canvasWidth = mainCanvas.width;
+var canvasHeight = mainCanvas.height;
+
+var requestAnimationFrame = window.requestAnimationFrame ||
+                            window.mozRequestAnimationFrame ||
+                            window.webkitRequestAnimationFrame ||
+                            window.msRequestAnimationFrame;
+ 
+
+
+
+
+
+// Initialise
+
+var x = 0;
+var y = 0;
+
+var xo = 0;
+var yo = 0;
+
+var v = 5;
+var angle = 0;
+
+var x_step = 0;
+var y_step = 0;
+
+var neutron_radius = 3;
+var uranium_radius = 8;
+var products_radius = 4;
+
+var dist = 0;
+
+var neutrons = [];
+var future_neutrons = [];
+var uranium_atoms = [];
+var reaction_products = [];
+
+
+function create_scene() {
+
+	neutrons = [];
+	future_neutrons = [];
+	reaction_products = [];
+	uranium_atoms = [];
+
+	for (i = 0; i < 400; i++) {
+
+		x = Math.random()*canvasWidth;
+		y = Math.random()*canvasHeight;
+
+		angle = Math.random()*Math.PI*2;
+	
+		x_step = 2 * Math.cos(angle);
+		y_step = 2 * Math.sin(angle);
+
+		uranium_atoms.push([x, y, x_step, y_step, 1]);
+
+	}
+
+}
+
+create_scene();
+
+
+function getMousePosition(canvas, event) {
+	let rect = canvas.getBoundingClientRect();
+	let x_click = event.clientX - rect.left;
+	let y_click = event.clientY - rect.top;
+
+	angle = Math.random()*Math.PI*2;
+	
+	x_step = v * Math.cos(angle);
+	y_step = v * Math.sin(angle);
+	
+	neutrons.push([x_click, y_click, x_step, y_step, 1]);
+
+}
+
+let canvasElem = document.querySelector("canvas");
+
+canvasElem.addEventListener("mousedown", function (e) {
+	getMousePosition(canvasElem, e);
+});
+
+
+
+
+
+
+
+
+
+
+ function drawAnt() {
+
+	console.log(uranium_atoms.length + neutrons.length + reaction_products.length);
+
+	// Clear canvas and paint background
+	
+	mainContext.clearRect(0, 0, canvasWidth, canvasHeight);
+	mainContext.fillStyle = "white";
+    mainContext.fillRect(0, 0, canvasWidth, canvasHeight);
+
+
+	// Neutrons
+
+	for (i = 0; i < neutrons.length; i++) {
+	
+		if (neutrons[i][4] == 1) {
+	
+			xo = neutrons[i][0];
+			yo = neutrons[i][1];
+			
+			for (j = 0; j < uranium_atoms.length; j++) {
+			
+				dist = Math.sqrt(Math.pow(neutrons[i][0]-uranium_atoms[j][0], 2) + Math.pow(neutrons[i][1]-uranium_atoms[j][1], 2))
+				
+				if (dist < uranium_radius && uranium_atoms[j][4] == 1) {
+				
+					neutrons[i][4] = 0;
+					uranium_atoms[j][4] = 0;
+						
+					for (k = 0; k < 2; k++) {
+						angle = Math.random()*Math.PI*2;
+						x_step = 2 * Math.cos(angle);
+						y_step = 2 * Math.sin(angle);	
+						reaction_products.push([uranium_atoms[j][0], uranium_atoms[j][1], x_step, y_step, 1]);
+					}
+					
+					for (k = 0; k < 3; k++) {
+						angle = Math.random()*Math.PI*2;
+						x_step = v * Math.cos(angle);
+						y_step = v * Math.sin(angle);		
+						future_neutrons.push([uranium_atoms[j][0], uranium_atoms[j][1], x_step, y_step, 1]);
+					}
+					
+				}
+				
+			}
+
+			
+			mainContext.beginPath();
+			mainContext.arc(xo, yo, neutron_radius, 0, Math.PI * 2, false);
+			mainContext.closePath();
+
+			mainContext.fillStyle = "black";
+			mainContext.fill();
+		
+			x = xo + neutrons[i][2];
+			y = yo + neutrons[i][3];
+
+			if (x >= canvasWidth + neutron_radius) { x = x - canvasWidth - (2*neutron_radius); }
+			if (x < -neutron_radius) { x = x + canvasWidth + (2*neutron_radius); }
+			if (y >= canvasHeight + neutron_radius) { y = y - canvasHeight - (2*neutron_radius); }
+			if (y < -neutron_radius) { y = y + canvasHeight + (2*neutron_radius); }	
+		
+			neutrons[i][0] = x;
+			neutrons[i][1] = y;		
+	
+		}
+	
+	}
+	
+
+	// Uranium atoms
+	
+	for (i = 0; i < uranium_atoms.length; i++) {
+	
+		if (uranium_atoms[i][4] == 1) {
+		
+			xo = uranium_atoms[i][0];
+			yo = uranium_atoms[i][1];
+
+			mainContext.beginPath();
+			mainContext.arc(xo, yo, uranium_radius, 0, Math.PI * 2, false);
+			mainContext.closePath();
+
+			mainContext.fillStyle = "orange";
+			mainContext.fill();
+		
+			x = xo + uranium_atoms[i][2];
+			y = yo + uranium_atoms[i][3];
+		
+			if (x >= canvasWidth + uranium_radius) { x = x - canvasWidth - (2*uranium_radius); }
+			if (x < -uranium_radius) { x = x + canvasWidth + (2*uranium_radius); }
+			if (y >= canvasHeight + uranium_radius) { y = y - canvasHeight - (2*uranium_radius); }
+			if (y < -uranium_radius) { y = y + canvasHeight + (2*uranium_radius); }	
+		
+			uranium_atoms[i][0] = x;
+			uranium_atoms[i][1] = y;	
+		
+		}
+
+	}
+	
+	
+	// Reaction Products
+	
+	for (i = 0; i < reaction_products.length; i++) {
+	
+		xo = reaction_products[i][0];
+		yo = reaction_products[i][1];
+
+		mainContext.beginPath();
+		mainContext.arc(xo, yo, products_radius, 0, Math.PI * 2, false);
+		mainContext.closePath();
+
+		mainContext.fillStyle = "green";
+		mainContext.fill();
+		
+		x = xo + reaction_products[i][2];
+		y = yo + reaction_products[i][3];
+		
+		if (x >= canvasWidth + products_radius) { x = x - canvasWidth - (2*products_radius); }
+		if (x < -products_radius) { x = x + canvasWidth + (2*products_radius); }
+		if (y >= canvasHeight + products_radius) { y = y - canvasHeight - (2*products_radius); }
+		if (y < -products_radius) { y = y + canvasHeight + (2*products_radius); }	
+		
+		reaction_products[i][0] = x;
+		reaction_products[i][1] = y;
+	
+	}
+	
+
+
+	for (i = 0; i < future_neutrons.length; i++) {
+		neutrons.push(future_neutrons[i]);
+	}
+	
+	future_neutrons = [];
+
+		
+	requestAnimationFrame(drawAnt);
+	
+} 
+
+drawAnt();
+
+ 
+</script>
+
+</body>
+
+</html>
