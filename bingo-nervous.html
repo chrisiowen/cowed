@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+<title>Review Bingo</title>
+<style>
+
+.wrappera {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.button {
+  background-color: white;
+  width: 150px;
+  height: 150px;
+  border: 1px solid gray;
+  box-shadow: 2px 2px 3px gray;
+  margin: 4px;
+  display: inline-block;
+  font-size: 0.8em;
+  border-radius: 10px;
+}
+
+.button:hover:enabled {
+	border: 1px solid gray;
+	box-shadow: 2px 4px 6px gray;
+	transform: translateY(-2px);
+}
+
+.button:active:enabled {}
+
+
+.button:disabled {
+	background-color: lightgreen;
+}
+
+.question_div {
+	font-size: 2em;
+}
+
+
+
+</style>
+
+</head>
+
+
+<script>
+
+var qas = [
+["Question 1", "Receptor"],
+["Question 2", "Central"],
+["Question 3", "Interneuron"],
+["Question 4", "Reflex"],
+["Question 5", "Motor"],
+["Question 6", "Peripheral"],
+["Question 7", "Mechanoreceptor"],
+["Question 8", "Sensory"],
+["Question 9", "Neurotransmitters"],
+["Question 10", "Electrical impulses"],
+["Question 11", "Positive"],
+["Question 12", "Negative"],
+["Question 13", "Homeostasis"],
+["Question 14", "Photoreceptors"],
+["Question 15", "Excretory"],
+["Question 16", "Synapse"]
+];
+
+function shuffle(array) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+}
+
+function randomise_boxes() {
+	var order = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+	shuffle(order);
+	
+	console.log(order);
+	
+	for (let j in order) {
+		var btn_id = "btn" + order[j];
+		console.log(order[j], btn_id);
+		
+		document.getElementById(btn_id).innerHTML = qas[j][1];
+	
+	}
+	
+}
+
+var i = 0;
+var score = 0;
+
+function check_answer(btn) {
+	
+	if (i < 16) {
+	
+		var selected_answer = document.getElementById(btn).innerHTML;
+		console.log(i, selected_answer)
+	
+		if (selected_answer == qas[i][1]) {
+			document.getElementById(btn).disabled = true;
+			
+			score = score + 1;
+		}
+	
+		i = i + 1;
+		
+	}
+	
+	if (i < 16) {
+		document.getElementById("Question").innerHTML = "Listen for: " + qas[i][0];
+	}
+	
+	if (i >= 16) {
+		document.getElementById("Question").innerHTML = "SCORE: " + score;
+	}
+}
+
+</script>
+
+
+<body oncontextmenu="return false;" onLoad="randomise_boxes();">
+
+
+<center>
+
+<br><br>
+
+<div class="question_div" id="Question">Listen for: Question 1</div>
+
+<br>
+
+<button class="button" id="btn1" onclick="check_answer('btn1')">1</button>
+<button class="button" id="btn2" onclick="check_answer('btn2')">2</button>
+<button class="button" id="btn3" onclick="check_answer('btn3')">3</button>
+<button class="button" id="btn4" onclick="check_answer('btn4')">4</button>
+
+<br>
+
+<button class="button" id="btn5" onclick="check_answer('btn5')">5</button>
+<button class="button" id="btn6" onclick="check_answer('btn6')">6</button>
+<button class="button" id="btn7" onclick="check_answer('btn7')">7</button>
+<button class="button" id="btn8" onclick="check_answer('btn8')">8</button>
+
+<br>
+
+<button class="button" id="btn9" onclick="check_answer('btn9')">9</button>
+<button class="button" id="btn10" onclick="check_answer('btn10')">10</button>
+<button class="button" id="btn11" onclick="check_answer('btn11')">11</button>
+<button class="button" id="btn12" onclick="check_answer('btn12')">12</button>
+
+<br>
+
+<button class="button" id="btn13" onclick="check_answer('btn13')">13</button>
+<button class="button" id="btn14" onclick="check_answer('btn14')">14</button>
+<button class="button" id="btn15" onclick="check_answer('btn15')">15</button>
+<button class="button" id="btn16" onclick="check_answer('btn16')">16</button>
+
+
+</center>
+
+</body>
+</html>
